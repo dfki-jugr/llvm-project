@@ -51,11 +51,20 @@ public:
         GPUIndexIntrinsicOpLowering<gpu::GridDimOp, ROCDL::GridDimXOp,
                                     ROCDL::GridDimYOp, ROCDL::GridDimZOp>>(
         converter);
+    patterns.insert<OpToFuncCallLowering<AbsFOp>>(converter, "_ocml_fabs_f32",
+                                                 "_ocml_fabs_f64");
+    patterns.insert<OpToFuncCallLowering<CeilFOp>>(converter, "_ocml_ceil_f32",
+                                                 "_ocml_ceil_f64");
+    patterns.insert<OpToFuncCallLowering<CosOp>>(converter, "_ocml_cos_f32",
+                                                 "_ocml_cos_f64");
     patterns.insert<OpToFuncCallLowering<ExpOp>>(converter, "_ocml_exp_f32",
                                                  "_ocml_exp_f64");
 
     ConversionTarget target(getContext());
     target.addLegalDialect<LLVM::LLVMDialect, ROCDL::ROCDLDialect>();
+    target.addIllegalOp<LLVM::FAbsOp>();
+    target.addIllegalOp<LLVM::FCeilOp>();
+    target.addIllegalOp<LLVM::CosOp>();
     target.addIllegalOp<LLVM::ExpOp>();
     target.addDynamicallyLegalOp<FuncOp>(
         [&](FuncOp op) { return converter.isSignatureLegal(op.getType()); });
